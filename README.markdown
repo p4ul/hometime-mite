@@ -8,7 +8,8 @@ This script allows you to set a goal for how many hours/minutes you would like t
 Then given the time you would like to leave work it will tell you how many spare minutes you have left.
 
 
-Example  
+## Example  
+
 * home time 5:30pm
 * goal time to work 5 hours
 
@@ -18,12 +19,14 @@ This gives you 15 minutes 'spare' so you know you can mess round for 15 minutes 
 
 Currently hours to work is hardcoded as 7:30, and home time is set to 5:30pm.
 
-upcoming features  
+## upcoming features  
+
 * let user set home time, goal time
 * show details all the time and make them dynamically update
 * make better looking
 
-known bugs  
+## known bugs  
+
 * negatives are not handled nicely
 * looks ugly
 
