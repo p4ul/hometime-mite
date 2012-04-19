@@ -4,7 +4,7 @@
 // @include		*
 // @author		paul
 // @description	Helps to get you home on time
-// @version		0.0.1
+// @version		0.0.2
 // @match https://*.mite.yo.lk/
 // @match https://*.mite.yo.lk/daily
 // ==/UserScript==
@@ -13,18 +13,37 @@
 
 var main = function () {
 	'use strict';
-	var version = '0.0.1';
+	var version = '0.0.2';
 	
 	//create a button
 	
 	$('.side:last').append( $('<span>').html($('<a id="time_left">').addClass('button').html('show time')) );
-		$('.side:last').append( $('<br>').css('clear','both' ) );
+	$('.side:last').append( $('<br>').css('clear','both' ) );
 	$('.side:last').append( $('<span id="stats">').css({float:'left',height:'50px','margin-left':'15px'}).html('') );
+
+
+var goalMinutes = 7*60+30,
+	defaultHomeTime = "17:30";
+
+
+$('.side:last').append(' 	\
+	<h2>options</h2> \
+<form>	\
+<label for="goalMinutes">goal minutes</label> \
+<input type="text" class="goalMinutes" name="goalMinutes" value="'+goalMinutes+'" /><br />	\
+<label for="homeTime">home time</label> \
+<input type="text" class="homeTime" name="homeTime" value="'+defaultHomeTime+'" /><br /> \
+<h3>breaks</h3> \
+<input type="text" class="break" value="30" /><a class="removeBreak" href="#">- break</a><br /> \
+<a class="addBreak" href="#">add break</a> \
+</form> ');
+
+
 	
 	//new Date(year, month, day, hours, minutes, seconds, milliseconds)
 	//d.getHours();
 	
-	var goalMinutes = 7*60+30;
+	
 	
 	function goalMinutesLeft(){
 	
@@ -39,11 +58,13 @@ var main = function () {
 		return totalTime;		
 	}
 	
-	function homeTime(){
+	function getHomeTime(){
 		var then = new Date();
 	
-		then.setHours('17');
-		then.setMinutes('30');
+		var timeArray = $('.homeTime').val().split(':');
+
+		then.setHours(timeArray[0]);
+		then.setMinutes(timeArray[1]);
 		
 		return then;
 	}
@@ -60,7 +81,7 @@ var main = function () {
 	}
 	
 	$('#time_left').live('click',function(){
-				var status = getStatus(homeTime(), goalMinutesLeft());
+				var status = getStatus(getHomeTime(), goalMinutesLeft());
 				console.dir(status);
 				$('#stats').html('');
 				$('#stats').append($('<p>').html("remaining minutes " + status.remainingMins));
