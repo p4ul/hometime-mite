@@ -14,12 +14,50 @@
 var main = function () {
     'use strict';
 
-    function getStore(item) {
-        return window.localStorage.getItem(item);
+	function getFormatedDate() {
+		var MyDate = new Date();
+		var MyDateString;
+
+		MyDate.setDate(MyDate.getDate() + 20);
+
+		MyDateString = MyDate.getFullYear() + "-" + ('0' + (MyDate.getMonth()+1)).slice(-2) + "-" + ('0' + MyDate.getDate()).slice(-2);
+		return MyDateString;
+	}
+
+    //window.localStorage.clear
+
+    /**
+	* records the first and last clicks of the day
+    */
+    function addTimesForDate() {
+		var currentDate = getFormatedDate(),
+		times =	{},
+		date = new Date();
+
+		if( getStore('times') !== null ){
+			times =	getStore('times');
+		}
+
+		if( typeof times[currentDate] === 'undefined' ){
+			times[currentDate] = {start:false,end:false};
+		}
+
+		if( times[currentDate].start === false ){
+			times[currentDate].start = date.getHours() + ":" + date.getMinutes();
+		}
+
+		times[currentDate].end = date.getHours() + ":" + date.getMinutes();
+		setStore('times',times);
     }
+
+    function getStore(item) {
+        return JSON.parse(window.localStorage.getItem(item));
+    }
+
     function setStore(item,value){
         console.log('setting'+value);
-        window.localStorage.setItem(item,value);
+
+        window.localStorage.setItem(item,JSON.stringify(value));
     }
 
     var version = '0.0.2',
@@ -41,10 +79,14 @@ var main = function () {
         <input type="text" class="goalMinutes" name="goalMinutes" value="'+defaultGoalMinutes+'" /><br />  \
         <label for="homeTime">home time</label> \
         <input type="text" class="homeTime" name="homeTime" value="'+defaultHomeTime+'" /><br /> \
+        </form> ');
+
+//not implemented yet
+/**
         <h3>breaks</h3> \
         <input type="text" class="break" value="30" /><a class="removeBreak" href="#">- break</a><br /> \
         <a class="addBreak" href="#">add break</a> \
-        </form> ');
+**/
 
     $('.goalMinutes').bind('change',function(d){setStore('defaultGoalMinutes',$(this).val());});
     $('.homeTime').bind('change',function(d){setStore('defaultHomeTime',$(this).val());});
@@ -86,6 +128,8 @@ var main = function () {
         return status;
     }
 
+    $('body').live('click',addTimesForDate);
+
     $('#time_left').live('click',function(){
                 var status = getStatus(getHomeTime(), getGoalMinutesLeft());
                 console.dir(status);
@@ -96,6 +140,7 @@ var main = function () {
                 $('#stats').append( $('<em>').html(status.goalMinutesLeft));
                 $('#stats').append(", spare minutes ");
                 $('#stats').append( $('<em>').html(status.spareMinutes));
+		console.log(getStore('times'),'times')
     });
 };
 
