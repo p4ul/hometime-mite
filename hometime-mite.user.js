@@ -18,7 +18,7 @@ var main = function () {
 		var MyDate = new Date();
 		var MyDateString;
 
-		MyDate.setDate(MyDate.getDate() + 20);
+//		MyDate.setDate(MyDate.getDate() + 20);
 
 		MyDateString = MyDate.getFullYear() + "-" + ('0' + (MyDate.getMonth()+1)).slice(-2) + "-" + ('0' + MyDate.getDate()).slice(-2);
 		return MyDateString;
@@ -32,7 +32,8 @@ var main = function () {
     function addTimesForDate() {
 		var currentDate = getFormatedDate(),
 		times =	{},
-		date = new Date();
+		date = new Date(),
+		minutes = (date.getMinutes()<10?'0':'') + date.getMinutes();
 
 		if( getStore('times') !== null ){
 			times =	getStore('times');
@@ -43,10 +44,10 @@ var main = function () {
 		}
 
 		if( times[currentDate].start === false ){
-			times[currentDate].start = date.getHours() + ":" + date.getMinutes();
+			times[currentDate].start = date.getHours() + ":" + minutes;
 		}
 
-		times[currentDate].end = date.getHours() + ":" + date.getMinutes();
+		times[currentDate].end = date.getHours() + ":" + minutes;
 		setStore('times',times);
     }
 
