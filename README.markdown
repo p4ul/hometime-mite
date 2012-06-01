@@ -1,6 +1,6 @@
 # Hometime for Mite (mite.yo.lk) #
 
-_pre alpha version_
+_alpha version_
 
 This is a userscript for Google chrome that works with mite.yo.lk
 
@@ -16,18 +16,24 @@ Then given the time you would like to leave work it will tell you how many spare
 Current time is 1pm you started work at 12pm and have worked for 45 minutes.
 This gives you 15 minutes 'spare' so you know you can mess round for 15 minutes in and still make it home on time.
 
+Enter goal minutes to set this.
 
-Currently hours to work is hardcoded as 7:30, and home time is set to 5:30pm.
+## features
+* records start and end time
+* records utilisation
+* shows spare minutes remaining in day
 
 ## upcoming features  
 
-* let user set home time, goal time
+* ~~let user set home time, goal time~~
+* graphing of start/end time and utilsation 
 * show details all the time and make them dynamically update
-* make better looking
+* make better looking!
 
 ## known bugs  
 
 * negatives are not handled nicely
 * looks ugly
+* changing days can make things wierd
 
 click this to install https://github.com/p4ul/hometime-mite/raw/master/hometime-mite.user.js

@@ -4,7 +4,7 @@
 // @include     *
 // @author      paul
 // @description Helps to get you home on time
-// @version     0.0.2
+// @version     0.0.3 //change in js as well
 // @match https://*.mite.yo.lk/
 // @match https://*.mite.yo.lk/daily
 // ==/UserScript==
@@ -47,6 +47,8 @@ var main = function () {
 			times[currentDate].start = date.getHours() + ":" + minutes;
 		}
 
+                        times[currentDate].utilisation = getUtilsation();
+
 		times[currentDate].end = date.getHours() + ":" + minutes;
 		setStore('times',times);
     }
@@ -61,7 +63,32 @@ var main = function () {
         window.localStorage.setItem(item,JSON.stringify(value));
     }
 
-    var version = '0.0.2',
+    function getStartTime(){
+        var times = getStore('times'),
+              currentDate = getFormatedDate();
+        return times[currentDate].start;
+    }
+
+    function timeToMins(time) {
+        var timeArray = time.split(':'),
+               mins = 0;
+        mins = timeArray[0] * 60;
+        mins += timeArray[1] ;
+
+        return mins;
+    }
+
+    function getUtilsation() {
+        var date = new Date(),
+              start = timeToMins(getStartTime()),
+              used = timeToMins($('#minutes_sum').text()),
+              now  =  timeToMins(date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes());
+
+        return Math.round(used / (now - start) * 100 * 100 )/100;//round to 2dp
+
+    }
+
+    var version = '0.0.3',//change in docblock as well
         defaultGoalMinutes = getStore('defaultGoalMinutes') ? getStore('defaultGoalMinutes') : 7*60+30,
         defaultHomeTime = getStore('defaultHomeTime') ? getStore('defaultHomeTime') :"17:30";
     
@@ -123,6 +150,7 @@ var main = function () {
             status = {},
             remainingMins = ( homeTime.getHours() * 60 - now.getHours() * 60 ) + ( homeTime.getMinutes() - now.getMinutes() );
 
+
         status.remainingMins = remainingMins;
         status.goalMinutesLeft = goalMinutesLeft;
         status.spareMinutes = remainingMins - goalMinutesLeft;
@@ -135,7 +163,16 @@ var main = function () {
                 var status = getStatus(getHomeTime(), getGoalMinutesLeft());
                 console.dir(status);
                 $('#stats').html('');
-                $('#stats').append("remaining minutes in day ");
+
+                
+                $('#stats').append("Start time Today:");
+                $('#stats').append( $('<em>').html(getStartTime()));
+
+                $('#stats').append(", Utilisation:");
+                $('#stats').append( $('<em>').html(getUtilsation()+"%"));
+
+
+                $('#stats').append(", remaining minutes in day ");
                 $('#stats').append( $('<em>').html(status.remainingMins));
                 $('#stats').append(", goal minutes left ");
                 $('#stats').append( $('<em>').html(status.goalMinutesLeft));
@@ -144,6 +181,9 @@ var main = function () {
 		console.log(getStore('times'),'times')
     });
 };
+
+
+
 
 // Inject our main script
 var script = document.createElement('script');
