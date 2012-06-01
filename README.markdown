@@ -29,6 +29,8 @@ Enter goal minutes to set this.
 * graphing of start/end time and utilsation 
 * show details all the time and make them dynamically update
 * make better looking!
+* log spare minutes
+
 
 ## known bugs  
 
