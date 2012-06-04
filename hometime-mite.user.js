@@ -66,10 +66,16 @@ var main = function () {
     function getStartTime(){
         var times = getStore('times'),
               currentDate = getFormatedDate();
+	if(typeof times[currentDate] === 'undefined'){
+		return null;
+	}
         return times[currentDate].start;
     }
 
     function timeToMins(time) {
+	if( time === null ){
+		return false;
+	}
         var timeArray = time.split(':'),
                mins = 0;
         mins = timeArray[0] * 60;
@@ -83,7 +89,9 @@ var main = function () {
               start = timeToMins(getStartTime()),
               used = timeToMins($('#minutes_sum').text()),
               now  =  timeToMins(date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes());
-
+	if( start === null ){
+		return 0;
+	}
         return Math.round(used / (now - start) * 100 * 100 )/100;//round to 2dp
 
     }
