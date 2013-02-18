@@ -99,9 +99,9 @@ var main = function () {
     var version = '0.0.3',//change in docblock as well
         defaultGoalMinutes = getStore('defaultGoalMinutes') ? getStore('defaultGoalMinutes') : 7*60+30,
         defaultHomeTime = getStore('defaultHomeTime') ? getStore('defaultHomeTime') :"17:30";
-    
 
-    //create a button    
+
+    //create a button
     $('.side:last').append( $('<span>').html($('<a id="time_left">').addClass('button').html('show time')) );
     $('.side:last').append( $('<br>').css('clear','both' ) );
     $('.side:last').append( $('<span id="stats">').css({float:'left',height:'50px','margin-left':'15px'}).html('') );
@@ -165,14 +165,14 @@ var main = function () {
         return status;
     }
 
-    $('body').live('click',addTimesForDate);
+    $('body').on('click',addTimesForDate);
 
-    $('#time_left').live('click',function(){
+    $('#time_left').on('click',function(){
                 var status = getStatus(getHomeTime(), getGoalMinutesLeft());
                 console.dir(status);
                 $('#stats').html('');
 
-                
+
                 $('#stats').append("Start time Today:");
                 $('#stats').append( $('<em>').html(getStartTime()));
 
