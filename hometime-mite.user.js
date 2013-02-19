@@ -162,6 +162,7 @@ var main = function () {
         status.remainingMins = remainingMins;
         status.goalMinutesLeft = goalMinutesLeft;
         status.spareMinutes = remainingMins - goalMinutesLeft;
+
         return status;
     }
 
@@ -173,20 +174,40 @@ var main = function () {
                 $('#stats').html('');
 
 
-                $('#stats').append("Start time Today:");
+                $('#stats').append(" * Start time Today:");
                 $('#stats').append( $('<em>').html(getStartTime()));
+                $('#stats').append( $('<br />'));
 
-                $('#stats').append(", Utilisation:");
+                $('#stats').append(" * Utilisation:");
                 $('#stats').append( $('<em>').html(getUtilsation()+"%"));
+                $('#stats').append( $('<br />'));
 
 
-                $('#stats').append(", remaining minutes in day ");
-                $('#stats').append( $('<em>').html(status.remainingMins));
-                $('#stats').append(", goal minutes left ");
-                $('#stats').append( $('<em>').html(status.goalMinutesLeft));
-                $('#stats').append(", spare minutes ");
-                $('#stats').append( $('<em>').html(status.spareMinutes));
-		console.log(getStore('times'),'times')
+                $('#stats').append(" * goal minutes left ");
+                if (status.goalMinutesLeft > 0) {
+                    $('#stats').append( $('<em>').html(status.goalMinutesLeft));
+                    $('#stats').append( $('<br />'));
+
+
+                    $('#stats').append(" * remaining minutes in day ");
+                    if(status.remainingMins > 0) {
+                        $('#stats').append( $('<em>').html(status.remainingMins));
+                    } else {
+                        $('#stats').append( $('<em>').html(status.remainingMins).css('color','red'));
+                    }
+                    $('#stats').append( $('<br />'));
+
+
+                    $('#stats').append(" * spare minutes ");
+                    if(status.spareMinutes > 0) {
+                        $('#stats').append( $('<em>').html(status.spareMinutes));
+                    } else {
+                        $('#stats').append( $('<em>').html(status.spareMinutes).css('color', 'red'));
+                    }
+
+                }
+
+                console.log(getStore('times'),'times')
     });
 };
 
