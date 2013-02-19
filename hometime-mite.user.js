@@ -4,7 +4,7 @@
 // @include     *
 // @author      paul
 // @description Helps to get you home on time
-// @version     0.0.3 //change in js as well
+// @version     0.0.4 //change in js as well
 // @match https://*.mite.yo.lk/
 // @match https://*.mite.yo.lk/daily
 // ==/UserScript==
@@ -13,7 +13,6 @@
 
 var main = function () {
     'use strict';
-
 	function getFormatedDate() {
 		var MyDate = new Date();
 		var MyDateString;
@@ -84,6 +83,18 @@ var main = function () {
         return mins;
     }
 
+    function minsToHours(mins) {
+        return Math.floor(mins / 60)  + ":" + ("00" + (mins%60)).slice(-2);
+    }
+
+    function getGoalHours() {
+        return minsToHours(getStore('defaultGoalMinutes'));
+    }
+
+    function updateGoalHours() {
+        $('#goal').html(getGoalHours());
+    }
+
     function getUtilsation() {
         var date = new Date(),
               start = timeToMins(getStartTime()),
@@ -96,7 +107,7 @@ var main = function () {
 
     }
 
-    var version = '0.0.3',//change in docblock as well
+    var version = '0.0.4',//change in docblock as well
         defaultGoalMinutes = getStore('defaultGoalMinutes') ? getStore('defaultGoalMinutes') : 7*60+30,
         defaultHomeTime = getStore('defaultHomeTime') ? getStore('defaultHomeTime') :"17:30";
 
@@ -111,8 +122,9 @@ var main = function () {
     $('.side:last').append('    \
         <h2>options</h2> \
         <form>  \
+        <span id="goal">' +  getGoalHours() + '</span> \
         <label for="goalMinutes">goal minutes</label> \
-        <input type="text" class="goalMinutes" name="goalMinutes" value="'+defaultGoalMinutes+'" /><br />  \
+        <input type="text" class="goalMinutes" name="goalMinutes" value="' + defaultGoalMinutes + '" /><br />  \
         <label for="homeTime">home time</label> \
         <input type="text" class="homeTime" name="homeTime" value="'+defaultHomeTime+'" /><br /> \
         </form> ');
@@ -124,8 +136,16 @@ var main = function () {
         <a class="addBreak" href="#">add break</a> \
 **/
 
-    $('.goalMinutes').bind('change',function(d){setStore('defaultGoalMinutes',$(this).val());});
-    $('.homeTime').bind('change',function(d){setStore('defaultHomeTime',$(this).val());});
+    $('.goalMinutes').on('change',function(d){
+        setStore('defaultGoalMinutes',$(this).val());
+        updateStats();
+        updateGoalHours();
+    });
+
+    $('.homeTime').on('change',function(d){
+        setStore('defaultHomeTime',$(this).val());
+        updateStats();
+    });
 
 
     $('.main.second').after($('<div id="stats">').addClass('main').css({float:'left',height:'50px',width:'77%','background-color':''}).html(''));
@@ -168,11 +188,11 @@ var main = function () {
 
     $('body').on('click',addTimesForDate);
 
-    $('#time_left').on('click',function(){
+
+    function updateStats() {
                 var status = getStatus(getHomeTime(), getGoalMinutesLeft());
                 console.dir(status);
                 $('#stats').html('');
-
 
                 $('#stats').append(" * Start time Today:");
                 $('#stats').append( $('<em>').html(getStartTime()));
@@ -182,16 +202,15 @@ var main = function () {
                 $('#stats').append( $('<em>').html(getUtilsation()+"%"));
                 $('#stats').append( $('<br />'));
 
-
                 $('#stats').append(" * goal minutes left ");
                 if (status.goalMinutesLeft > 0) {
-                    $('#stats').append( $('<em>').html(status.goalMinutesLeft));
+                    $('#stats').append( $('<em>').html(status.goalMinutesLeft + ", hours " + minsToHours(status.goalMinutesLeft)));
                     $('#stats').append( $('<br />'));
 
 
                     $('#stats').append(" * remaining minutes in day ");
                     if(status.remainingMins > 0) {
-                        $('#stats').append( $('<em>').html(status.remainingMins));
+                        $('#stats').append( $('<em>').html(status.remainingMins + ", hours " + minsToHours(status.remainingMins)));
                     } else {
                         $('#stats').append( $('<em>').html(status.remainingMins).css('color','red'));
                     }
@@ -199,15 +218,23 @@ var main = function () {
 
 
                     $('#stats').append(" * spare minutes ");
-                    if(status.spareMinutes > 0) {
+                    if(status.spareMinutes >= 60 ) {
+                        $('#stats').append( $('<em>').html(status.spareMinutes + ", hours " + minsToHours(status.spareMinutes)));
+                    }else if(status.spareMinutes > 0 ) {
                         $('#stats').append( $('<em>').html(status.spareMinutes));
                     } else {
                         $('#stats').append( $('<em>').html(status.spareMinutes).css('color', 'red'));
                     }
+                    $('#stats').append( $('<br />'));
 
                 }
 
                 console.log(getStore('times'),'times')
+    }
+
+
+    $('#time_left').on('click',function(){
+        updateStats();
     });
 };
 
