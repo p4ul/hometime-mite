@@ -4,52 +4,53 @@
 // @include     *
 // @author      paul
 // @description Helps to get you home on time
-// @version     0.0.4 //change in js as well
+// @version     0.0.7 //change in js as well
 // @match https://*.mite.yo.lk/
 // @match https://*.mite.yo.lk/daily
 // ==/UserScript==
 
 /*global document, $*/
 
+var version = '0.0.7';//change in docblock as well
+
 var main = function () {
     'use strict';
-	function getFormatedDate() {
-		var MyDate = new Date();
-		var MyDateString;
+    function getFormatedDate() {
+        var MyDate = new Date();
+        var MyDateString;
 
-//		MyDate.setDate(MyDate.getDate() + 20);
+//      MyDate.setDate(MyDate.getDate() + 20);
 
-		MyDateString = MyDate.getFullYear() + "-" + ('0' + (MyDate.getMonth()+1)).slice(-2) + "-" + ('0' + MyDate.getDate()).slice(-2);
-		return MyDateString;
-	}
+        MyDateString = MyDate.getFullYear() + "-" + ('0' + (MyDate.getMonth()+1)).slice(-2) + "-" + ('0' + MyDate.getDate()).slice(-2);
+        return MyDateString;
+    }
 
     //window.localStorage.clear
 
     /**
-	* records the first and last clicks of the day
+    * records the first and last clicks of the day
     */
     function addTimesForDate() {
-		var currentDate = getFormatedDate(),
-		times =	{},
-		date = new Date(),
-		minutes = (date.getMinutes()<10?'0':'') + date.getMinutes();
+        var currentDate = getFormatedDate(),
+        times = {},
+        date = new Date(),
+        minutes = (date.getMinutes()<10?'0':'') + date.getMinutes();
 
-		if( getStore('times') !== null ){
-			times =	getStore('times');
-		}
+        if( getStore('times') !== null ){
+            times = getStore('times');
+        }
 
-		if( typeof times[currentDate] === 'undefined' ){
-			times[currentDate] = {start:false,end:false};
-		}
+        if( typeof times[currentDate] === 'undefined' ){
+            times[currentDate] = {start:false,end:false};
+        }
 
-		if( times[currentDate].start === false ){
-			times[currentDate].start = date.getHours() + ":" + minutes;
-		}
+        if( times[currentDate].start === false ){
+            times[currentDate].start = date.getHours() + ":" + minutes;
+        }
+        times[currentDate].utilisation = getUtilsation();
 
-                        times[currentDate].utilisation = getUtilsation();
-
-		times[currentDate].end = date.getHours() + ":" + minutes;
-		setStore('times',times);
+        times[currentDate].end = date.getHours() + ":" + minutes;
+        setStore('times',times);
     }
 
     function getStore(item) {
@@ -62,19 +63,30 @@ var main = function () {
         window.localStorage.setItem(item,JSON.stringify(value));
     }
 
+
+    function setStartTime(time){
+        var times = getStore('times'),
+              currentDate = getFormatedDate();
+        if(typeof times[currentDate] === 'undefined'){
+            times[currentDate] = {};
+        }
+        times[currentDate].defaultStartTime = time;
+        setStore('times',times);
+    }
+
     function getStartTime(){
         var times = getStore('times'),
               currentDate = getFormatedDate();
-	if(typeof times[currentDate] === 'undefined'){
-		return null;
-	}
-        return times[currentDate].start;
+        if(typeof times[currentDate] === 'undefined'){
+            return null;
+        }
+        return times[currentDate].defaultStartTime;
     }
 
     function timeToMins(time) {
-	if( time === null ){
-		return false;
-	}
+    if( time === null || time === undefined ){
+        return false;
+    }
         var timeArray = time.split(':'),
                mins = 0;
         mins = timeArray[0] * 60;
@@ -100,16 +112,16 @@ var main = function () {
               start = timeToMins(getStartTime()),
               used = timeToMins($('#minutes_sum').text()),
               now  =  timeToMins(date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes());
-	if( start === null ){
-		return 0;
-	}
+    if( start === null ){
+        return 0;
+    }
         return Math.round(used / (now - start) * 100 * 100 )/100;//round to 2dp
 
     }
 
-    var version = '0.0.4',//change in docblock as well
-        defaultGoalMinutes = getStore('defaultGoalMinutes') ? getStore('defaultGoalMinutes') : 7*60+30,
-        defaultHomeTime = getStore('defaultHomeTime') ? getStore('defaultHomeTime') :"17:30";
+    var defaultGoalMinutes = getStore('defaultGoalMinutes') ? getStore('defaultGoalMinutes') : 7*60+30,
+        defaultHomeTime = getStore('defaultHomeTime') ? getStore('defaultHomeTime') :"17:30",
+        defaultStartTime = getStore('defaultStartTime') ? getStore('defaultStartTime') : "08:40";
 
 
     //create a button
@@ -125,6 +137,8 @@ var main = function () {
         <span id="goal">' +  getGoalHours() + '</span> \
         <label for="goalMinutes">goal minutes</label> \
         <input type="text" class="goalMinutes" name="goalMinutes" value="' + defaultGoalMinutes + '" /><br />  \
+        <label for="startTime">start time</label> \
+        <input type="text" class="startTime" name="startTime" value="' + defaultStartTime + '" /><br /> \
         <label for="homeTime">home time</label> \
         <input type="text" class="homeTime" name="homeTime" value="'+defaultHomeTime+'" /><br /> \
         </form> ');
@@ -144,6 +158,11 @@ var main = function () {
 
     $('.homeTime').on('change',function(d){
         setStore('defaultHomeTime',$(this).val());
+        updateStats();
+    });
+
+    $('.startTime').on('change',function(d){
+        setStartTime($(this).val());
         updateStats();
     });
 
